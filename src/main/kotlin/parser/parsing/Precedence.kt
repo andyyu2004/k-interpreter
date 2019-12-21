@@ -8,5 +8,5 @@ object Precedence {
     const val EXPONENT = 5
     const val PREFIX = 6
     const val POSTFIX = 7
-    const val CALL = 8
+    const val INVOKE = 8
 }

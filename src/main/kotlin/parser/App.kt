@@ -1,9 +1,12 @@
 package parser
 
+import com.andreapivetta.kolor.Color
+import com.andreapivetta.kolor.Kolor
+import com.andreapivetta.kolor.red
+import com.andreapivetta.kolor.yellow
 import parser.lexing.*
 import org.jline.reader.*
 import org.jline.terminal.*
-import org.jline.reader.impl.history.DefaultHistory
 import parser.parsing.Parser
 import parser.parsing.generateGrammar
 
@@ -39,8 +42,8 @@ fun interactive() {
 
     try {
         while (true) {
-            print("λ ")
-            val line = reader.readLine()
+            val line = reader.readLine("λ ")
+            if (line.isBlank()) continue
             lexer.lex(line).bind {
 //                println(it)
                 parser.parse(it)
@@ -48,7 +51,8 @@ fun interactive() {
                 println(it.fmtp())
                 println(it)
                 it
-            }.catch(::println)
+            }.catch { println(Kolor.foreground(it, Color.LIGHT_RED)) }
+
 
         }
 

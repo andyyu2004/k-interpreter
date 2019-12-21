@@ -60,7 +60,12 @@ class Lexer(private val syntax: LexSyntax) {
     private fun match() : Either<String, Unit> {
         for ((regex, type) in syntax.symbols) {
             val res = regex.find(src) ?: continue
-            emitToken(src.slice(res.range), type)
+            val lexeme = src.slice(res.range)
+            val keyword = syntax.keywords[lexeme]
+
+            if (keyword != null) emitToken(lexeme, keyword)
+            else emitToken(lexeme, type)
+
             return Right(Unit)
         }
         return Left("$line:$col:Failed to lex symbol in remaining source: `${src.trimEnd()}`")

@@ -5,8 +5,9 @@ package parser.lexing
  * Ordering left-right in precedence
  */
 
-data class LexSyntax(
+data class LexSyntax (
     val symbols: Iterable<Pair<Regex, TokenType>>,
+    val keywords: Map<String, TokenType>,
     val lineComment: Regex,
     val multiComment: Regex? = null
 )

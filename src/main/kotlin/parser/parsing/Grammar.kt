@@ -1,29 +1,44 @@
 package parser.parsing
 
 import parser.lexing.TokenType
-import parser.parsing.parselets.*
+import parser.parsing.parselets.nud.*
+import parser.parsing.parselets.left.*
 import java.util.*
 
+/**
+ * Null denotation (nud) and
+ * Left denotation (led) symbols
+ */
 data class Grammar(
-    val prefixParselets: EnumMap<TokenType, PrefixParselet> = EnumMap(TokenType::class.java),
-    val infixParselets:  EnumMap<TokenType, BinaryOpParselet> = EnumMap(TokenType::class.java)
+        val nullParselets: EnumMap<TokenType, NullParselet> = EnumMap(TokenType::class.java),
+        val leftParselets:  EnumMap<TokenType, LeftParselet> = EnumMap(TokenType::class.java)
 )
 
 fun generateGrammar() = Grammar (
-    prefixParselets = EnumMap(mapOf(
+    nullParselets = EnumMap(mapOf(
         TokenType.Identifier to NameParselet(),
+        TokenType.Float      to FloatingParselet(),
+        TokenType.Integral   to IntegralParselet(),
         TokenType.Tilde      to PrefixOpParselet(),
         TokenType.Plus       to PrefixOpParselet(),
         TokenType.Minus      to PrefixOpParselet(),
-        TokenType.Bang       to PrefixOpParselet()
+        TokenType.Bang       to PrefixOpParselet(),
+        TokenType.LParen     to GroupParselet(),
+        TokenType.LBrace     to BlockParselet(),
+        TokenType.String     to StringParselet()
+
     )),
 
-    infixParselets = EnumMap(mapOf(
-        TokenType.Plus to BinaryOpParselet(Precedence.SUM),
-        TokenType.Minus to BinaryOpParselet(Precedence.SUM),
-        TokenType.Caret to BinaryOpParselet(Precedence.EXPONENT, true),
-        TokenType.Star to BinaryOpParselet(Precedence.PRODUCT),
-        TokenType.Slash to BinaryOpParselet(Precedence.PRODUCT)
+    leftParselets = EnumMap(mapOf(
+        TokenType.Plus   to BinaryOpParselet(Precedence.SUM),
+        TokenType.Minus  to BinaryOpParselet(Precedence.SUM),
+        TokenType.Caret  to BinaryOpParselet(Precedence.EXPONENT, true),
+        TokenType.Star   to BinaryOpParselet(Precedence.PRODUCT),
+        TokenType.Slash  to BinaryOpParselet(Precedence.PRODUCT),
+        TokenType.DPlus  to PostfixOpParselet(),
+        TokenType.QMark  to TernaryParselet(),
+        TokenType.Equal  to AssignmentParselet(),
+        TokenType.LParen to ApplicationParselet()
     ))
 
 )
