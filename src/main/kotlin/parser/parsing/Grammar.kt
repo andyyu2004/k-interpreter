@@ -23,7 +23,7 @@ fun generateGrammar() = Grammar (
         TokenType.Plus       to PrefixOpParselet(),
         TokenType.Minus      to PrefixOpParselet(),
         TokenType.Bang       to PrefixOpParselet(),
-        TokenType.LParen     to GroupParselet(),
+        TokenType.LParen     to GroupParselet,
         TokenType.LBrace     to BlockParselet(),
         TokenType.String     to StringParselet()
 

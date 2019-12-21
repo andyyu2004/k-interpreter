@@ -6,11 +6,15 @@ import parser.lexing.TokenType
 import parser.parsing.Expr
 import parser.parsing.Parser
 
-class GroupParselet : NullParselet {
+object GroupParselet : NullParselet {
     override fun parse(parser: Parser, token: Token): Either<String, Expr> =
-        parser.parseExpression(0) assert parser.expect(TokenType.RParen) map {
-            Expr.Group(token, it)
-        }
-
-
+        parser.parseExpression(0)
+            .assert(parser.expect(TokenType.RParen))
+            .map { Expr.Group(token, it) as Expr }
+            // Try parse tuple if the assertion fails or if there is no expression inside (i.e. parserExpression fails)
+            .bindLeft {
+                parser.backtrack()
+                TupleParselet.parse(parser, token)
+            }
 }
+

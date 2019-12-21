@@ -1,11 +1,15 @@
 package parser.parsing
 
 import parser.lexing.Token
+import parser.types.LType
 import parser.util.padLeft
 
 /**
  * Arithmetic Operations
  */
+
+/** Typed Expression */
+data class TExpr(val expr: Expr, val type: LType? = null)
 
 sealed class Expr {
 
@@ -23,44 +27,47 @@ sealed class Expr {
     class Block(val token: Token, val exprs: List<Expr>) : Expr()
     class Fn(val token: Token, val params: List<String>, val body: Block): Expr()
     class EString(val token: Token) : Expr()
+    class Tuple(val token: Token, val xs: List<Expr>): Expr()
 
     // Try to recreate the source code format
     override fun toString() = fmt(0)
 
     private fun fmt(depth: Int) : String = when(this) {
-        is Bin     -> "${left.fmt(depth)} ${left.fmt(depth)} ${right.fmt(depth)}"
-        is Cond    -> "${cond.fmt(depth)} ? ${left.fmt(depth)} : ${right.fmt(depth)}"
+        is Bin     -> "$left $op $right"
+        is Cond    -> "$cond ? $left : $right"
         is Id      -> token.lexeme
         is EInt    -> token.lexeme
         is EFloat  -> token.lexeme
-        is Prefix  -> "${operator.lexeme}${operand.fmt(depth)}"
-        is Postfix -> "${operand.fmt(depth)}{operator.lexeme}"
+        is Prefix  -> "${operator.lexeme}$operand"
+        is Postfix -> "$operand${operator.lexeme}"
         is Group   -> "($expr)"
         is Assign  -> "$lvalue = $expr"
         is Apply   -> "$callee(${args.joinToString(", ")})"
-        is Block   -> "{\n${exprs.joinToString("\n") { it.fmt(depth + 4) }} \n${" ".repeat(depth)}}"
+        is Block   -> "{\n${exprs.joinToString("\n") { it.fmt(depth + 4) }} \n}"
         is Fn      -> TODO()
         is EString -> "\"${token.lexeme}\""
-    }.padLeft(depth)
+        is Tuple   -> "(${xs.joinToString(", ")})"
+    }.prependIndent(" ".repeat(depth))
 
     /** Fully parenthesized prefix format */
     fun fmtp() = fmtpHelper(0)
 
     private fun fmtpHelper(depth: Int): String = when(this) {
-        is Bin     -> "($op ${left.fmtpHelper(depth)} ${right.fmtpHelper(depth)})"
-        is Cond    -> "${cond.fmtpHelper(depth)} ? ${left.fmtpHelper(depth)} : ${right.fmtpHelper(depth)}"
+        is Bin     -> "($op ${left.fmtp()} ${right.fmtp()})"
+        is Cond    -> "${cond.fmtp()} ? ${left.fmtp()} : ${right.fmtp()}"
         is Id      -> token.lexeme
         is EInt    -> token.lexeme
         is EFloat  -> token.lexeme
-        is Prefix  -> "${operator.lexeme}${operand.fmtpHelper(depth)}"
-        is Postfix -> "${operand.fmtpHelper(depth)}${operator.lexeme}"
+        is Prefix  -> "${operator.lexeme}${operand.fmtp()}"
+        is Postfix -> "${operand.fmtp()}${operator.lexeme}"
         is Group   -> "($expr)"
         is Assign  -> "(def $lvalue $expr)"
-        is Apply   -> "($callee ${args.joinToString(" ") { it.fmtpHelper(depth) }})"
-        is Block   -> "{\n${exprs.joinToString("\n") { it.fmtpHelper(depth + 4) }}\n${" ".repeat(depth)}}"
+        is Apply   -> "($callee ${args.joinToString(" ") { it.fmtp() }})"
+        is Block   -> "{\n${exprs.joinToString("\n") { it.fmtpHelper(depth + 4) } }\n}"
         is Fn      -> TODO()
         is EString -> "\"${token.lexeme}\""
-    }.padLeft(depth)
+        is Tuple   -> "(${xs.joinToString(", ")})"
+    }.prependIndent(" ".repeat(depth))
 
 }
 

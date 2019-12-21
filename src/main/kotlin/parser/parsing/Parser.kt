@@ -10,6 +10,8 @@ class Parser(private val grammar: Grammar) {
     private var tokens = listOf<Token>()
     private var i = 0
 
+    private var backtrackIndex = 0
+
     private val precedence
         get() = grammar.leftParselets[peek()?.type]?.precedence ?: 0
 
@@ -22,6 +24,7 @@ class Parser(private val grammar: Grammar) {
 
     // Don't make precedence (right binding power, rbp) default to 0 to avoid missing parameter mistakes
     fun parseExpression(precedence: Int): Either<String, Expr> {
+        backtrackIndex = i
         var token = next() ?: return Left("Ran out of tokens")
         val prefix = grammar.nullParselets[token.type]
             ?: return error(token, "Failed to parse null denotation operator $token")
@@ -40,6 +43,8 @@ class Parser(private val grammar: Grammar) {
 
         return expr
     }
+
+    fun backtrack() { i = backtrackIndex }
 
     private fun next() : Token? {
         return if (i >= tokens.count()) null
