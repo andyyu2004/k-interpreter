@@ -16,7 +16,7 @@ class Parser(private val grammar: Grammar) {
         get() = grammar.leftParselets[peek()?.type]?.precedence ?: 0
 
     // The entry point of the parser intended to be called from the repl
-    public fun parse(tokens: List<Token>): Either<List<String>, Expr>{
+    public fun parse(tokens: List<Token>): Either<List<LError>, Expr>{
         this.tokens = tokens
         i = 0
 
@@ -24,7 +24,7 @@ class Parser(private val grammar: Grammar) {
 
         // Assertation only runs lazily
         return parseExpression(0)
-            .assert({ tokens[i].type == TokenType.EOF }, Left("Did not consume all input during parsing"))
+            .assert({ tokens[i].type == TokenType.EOF }, Left(LError(tokens[i], "Did not consume all input during parsing")))
             .catch(::listOf)
     }
 
@@ -33,9 +33,8 @@ class Parser(private val grammar: Grammar) {
     }
 
     // Don't make precedence (right binding power, rbp) default to 0 to avoid missing parameter mistakes
-    fun parseExpression(precedence: Int): Either<String, Expr> {
-        backtrackIndex = i
-        var token = next() ?: return Left("Ran out of tokens")
+    fun parseExpression(precedence: Int): Either<LError, Expr> {
+        var token = next() ?: return Left(LError(tokens[i - 1], "Ran out of tokens"))
         val prefix = grammar.nullParselets[token.type]
             ?: return error(token, "Failed to parse null denotation operator $token")
 
@@ -55,6 +54,7 @@ class Parser(private val grammar: Grammar) {
     }
 
     fun backtrack() { i = backtrackIndex }
+    fun markBacktrackPoint() { backtrackIndex = i }
 
     private fun next() : Token? {
         return if (i >= tokens.count()) null
@@ -69,7 +69,7 @@ class Parser(private val grammar: Grammar) {
     }
 
     /** Returns error if the current token is not the expected */
-    fun expect(type: TokenType) : Either<String, Token> {
+    fun expect(type: TokenType) : Either<LError, Token> {
         val curr = peek()
         return if (curr?.type != type) error(curr!!, "Expected $type found ${curr.type}")
         else { i++; Right(curr) }
@@ -87,8 +87,7 @@ class Parser(private val grammar: Grammar) {
 
     // Generate error from a token and error message
     // val error: (Token, String) -> Left<String, Any> = { (line, col), err ->  }
-    fun <T> error(token: Token, err: String) : Left<String, T> =
-        Left("${token.line}:${token.col}:$err")
+    fun <T> error(token: Token, err: String) : Left<LError, T> = Left(LError(token, err))
 
 }
 

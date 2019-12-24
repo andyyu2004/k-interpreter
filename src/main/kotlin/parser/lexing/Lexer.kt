@@ -20,10 +20,10 @@ class Lexer(private val syntax: LexSyntax) {
     }
 
     // Find a better way to do string substringing, copying can't be good
-    fun lex(source: String): Either<List<String>, List<Token>> {
+    fun lex(source: String): Either<List<LError>, List<Token>> {
         reset()
         src = source + "\n"
-        val errors = mutableListOf<String>()
+        val errors = mutableListOf<LError>()
         while (src.isNotEmpty()) {
             if (whitespaceComments()) break
             match().catch(errors::add)
@@ -56,7 +56,7 @@ class Lexer(private val syntax: LexSyntax) {
         return src.isEmpty()
     }
 
-    private fun match() : Either<String, Unit> {
+    private fun match() : Either<LError, Unit> {
         for ((regex, type) in syntax.symbols) {
             val res = regex.find(src) ?: continue
             val lexeme = src.slice(res.range)
@@ -71,7 +71,7 @@ class Lexer(private val syntax: LexSyntax) {
         val symbol = src[0]
         // Push it forward to prevent freeze on failure
         src = src.substring(1)
-        return Left("$line:$col:Failed to lex symbol: `${symbol}`")
+        return Left(LError(Token(symbol.toString(), col, line, TokenType.Unknown), "$line:$col:Failed to lex symbol: `${symbol}`"))
     }
 
     private fun emitToken(lexeme: String, type: TokenType) {

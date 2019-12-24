@@ -8,17 +8,32 @@ import parser.types.*
 
 object TypeParselets {
     // parses <id> : <T>
-    fun parseNameTypePair(parser: Parser) : Either<String, Pair<Token, LType?>> = parser.expect(TokenType.Identifier).bind {
-        if (!parser.match(TokenType.Colon)) Right<String, Pair<Token, LType?>>(Pair(it, null))
+    fun parseNameTypePair(parser: Parser) : Either<LError, Pair<Token, LType?>> = parser.expect(TokenType.Identifier).bind {
+        if (!parser.match(TokenType.Colon)) Right<LError, Pair<Token, LType?>>(Pair(it, null))
         else parse(parser).map { type -> Pair<Token, LType?>(it, type) }
     }
 
-    fun parse(parser: Parser) : Either<String, LType> {
-        var type: Either<String, LType> = parser.expect(TokenType.Typename).map(::TName)
+    fun parse(parser: Parser) : Either<LError, LType> {
+        var type = primitive(parser)
         while (parser.match(TokenType.RArrow)) {
             type.bind { t -> parse(parser).map { type = Right(TArrow(t, it)) }}
         }
         return type
+    }
+
+    private fun primitive(parser: Parser) : Either<LError, LType> {
+        if (parser.match(TokenType.Typename)) {
+            val token = parser.lookahead(-1)!!
+            return Right(TName(token))
+        } else if (parser.match(TokenType.LParen)) {
+            TODO()
+//            parse(parser).map { type ->
+//                when (parser.expect(TokenType.RParen)) {
+//                    is Right ->
+//                }
+//            }
+        }
+        TODO()
     }
 
 }

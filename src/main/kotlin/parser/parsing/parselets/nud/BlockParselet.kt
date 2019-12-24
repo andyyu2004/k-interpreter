@@ -5,9 +5,9 @@ import parser.lexing.*
 import parser.parsing.*
 
 object BlockParselet : NullParselet {
-    override fun parse(parser: Parser, token: Token): Either<String, Expr> {
+    override fun parse(parser: Parser, token: Token): Either<LError, Expr> {
         if (parser.match(TokenType.RBrace)) return Right(Expr.Block(token, listOf()))
-        val expressions: MutableList<Either<String, Expr>> = mutableListOf()
+        val expressions: MutableList<Either<LError, Expr>> = mutableListOf()
         do {
             if (parser.peek()?.type == TokenType.RBrace) {
                 // Then the last expression also had a semicolon and return should be suppressed

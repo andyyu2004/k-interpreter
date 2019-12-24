@@ -2,14 +2,17 @@ package parser
 
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
-import com.andreapivetta.kolor.red
-import com.andreapivetta.kolor.yellow
-import parser.lexing.*
-import org.jline.reader.*
-import org.jline.terminal.*
+import org.jline.reader.LineReader
+import org.jline.reader.LineReaderBuilder
+import org.jline.reader.UserInterruptException
+import org.jline.reader.impl.LineReaderImpl
+import org.jline.reader.impl.history.DefaultHistory
+import org.jline.terminal.TerminalBuilder
+import parser.lexing.Lexer
+import parser.lexing.generateSyntax
 import parser.parsing.Parser
 import parser.parsing.generateGrammar
-
+import java.nio.file.Paths
 
 
 fun main() {
@@ -33,12 +36,11 @@ fun interactive() {
         .system(true)
         .build()
 
-    val reader = LineReaderBuilder.builder()
-        .terminal(terminal)
-//        .history(history)
-        .build()
-
-//    val history = DefaultHistory(reader)
+    val reader = LineReaderImpl(terminal)
+    reader.setVariable(LineReader.HISTORY_FILE, Paths.get("historyfile.txt"))
+    reader.setVariable(LineReader.HISTORY_SIZE, 100)
+    val history = DefaultHistory(reader)
+    history.attach(reader)
 
     try {
         while (true) {

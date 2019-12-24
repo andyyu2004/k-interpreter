@@ -1,6 +1,7 @@
 package parser.parsing.parselets.left
 
 import parser.error.Either
+import parser.error.LError
 import parser.lexing.Token
 import parser.parsing.Expr
 import parser.parsing.Parser
@@ -11,7 +12,7 @@ import parser.parsing.Parser
  */
 interface LeftParselet {
     val precedence: Int
-    fun parse(parser: Parser, token: Token, left: Expr) : Either<String, Expr>
+    fun parse(parser: Parser, token: Token, left: Expr) : Either<LError, Expr>
 }
 
 

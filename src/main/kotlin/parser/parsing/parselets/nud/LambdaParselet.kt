@@ -10,10 +10,10 @@ import parser.util.Quadruple
 object LambdaParselet : NullParselet {
 
     @Suppress("UNCHECKED_CAST")
-    override fun parse(parser: Parser, token: Token): Either<String, Expr> {
-        val eargs = mutableListOf<Either<String, Pair<Token, LType?>>>()
+    override fun parse(parser: Parser, token: Token): Either<LError, Expr> {
+        val eargs = mutableListOf<Either<LError, Pair<Token, LType?>>>()
         if (parser.peek()?.type == TokenType.Identifier && parser.lookahead(1)?.type == TokenType.LParen)
-            return Left("Lambdas can not have names like functions. Try use a let binding instead.")
+            return Left(LError(token, "Lambdas can not have names like functions. Try use a let binding instead."))
 
         if (parser.match(TokenType.LParen)) {
             if (parser.peek()?.type != TokenType.RParen) {
@@ -25,8 +25,8 @@ object LambdaParselet : NullParselet {
 
         val args = Either.sequence(eargs)
         val tret =
-            if (parser.match(TokenType.RArrow)) TypeParselets.parse(parser) as Either<String, LType?>
-            else Right<String, LType?>(null)
+            if (parser.match(TokenType.RArrow)) TypeParselets.parse(parser) as Either<LError, LType?>
+            else Right<LError, LType?>(null)
         val expect = parser.expect(TokenType.RFArrow)
         val body = parser.parseExpression(0)
 

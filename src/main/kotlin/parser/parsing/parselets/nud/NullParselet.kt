@@ -1,6 +1,7 @@
 package parser.parsing.parselets.nud
 
 import parser.error.Either
+import parser.error.LError
 import parser.lexing.Token
 import parser.parsing.Expr
 import parser.parsing.Parser
@@ -11,6 +12,6 @@ interface NullParselet {
     val precedence
         get() = Precedence.PREFIX
 
-    fun parse(parser: Parser, token: Token) : Either<String, Expr>
+    fun parse(parser: Parser, token: Token) : Either<LError, Expr>
 }
 
