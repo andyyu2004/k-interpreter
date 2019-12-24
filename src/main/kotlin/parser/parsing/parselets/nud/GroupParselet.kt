@@ -16,7 +16,7 @@ object GroupParselet : NullParselet {
             // Try parse tuple if the assertion fails or if there is no expression inside (i.e. parserExpression fails)
             .bindLeft {
                 parser.backtrack()
-                TupleParselet.parse(parser, token)
+                TupleParselet.parse(parser) { parser.parseExpression(0) }.map { Expr.Tuple(token, it) as Expr }
             }
     }
 }

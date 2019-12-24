@@ -15,3 +15,7 @@ data class TArrow(val l: LType, val r: LType) : LType() {
 data class TName(val token: Token): LType() {
     override fun toString() = token.lexeme
 }
+
+data class TTuple(val types: List<LType>): LType() {
+    override fun toString() = types.joinToString(", ")
+}

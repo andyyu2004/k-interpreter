@@ -26,12 +26,17 @@ object TypeParselets {
             val token = parser.lookahead(-1)!!
             return Right(TName(token))
         } else if (parser.match(TokenType.LParen)) {
-            TODO()
-//            parse(parser).map { type ->
-//                when (parser.expect(TokenType.RParen)) {
-//                    is Right ->
-//                }
-//            }
+            println("backtrack")
+            parser.markBacktrackPoint()
+            when (val type = parse(parser)) {
+                is Right -> {
+                    return type assert parser.expect(TokenType.RParen)
+                }
+                is Left  -> {
+                    parser.backtrack()
+                    TupleParselet.parse(parser) { parse(parser) }.map { TTuple(it) }
+                }
+            }
         }
         TODO()
     }

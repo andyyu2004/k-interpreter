@@ -4,15 +4,17 @@ import parser.error.*
 import parser.lexing.*
 import parser.parsing.*
 
-object TupleParselet : NullParselet {
-    override fun parse(parser: Parser, token: Token): Either<LError, Expr> {
-        if (parser.match(TokenType.RParen)) return Right(Expr.Tuple(token, listOf()))
-        val elements: MutableList<Either<LError, Expr>> = mutableListOf()
+object TupleParselet {
+    // Also pass a parsing function so it can be reused for value tuples / type tuples etc
+    // Expects the opening LParen to be parsed already
+    fun <T> parse(parser: Parser, parsef: () -> Either<LError, T>): Either<LError, List<T>> {
+        if (parser.match(TokenType.RParen)) return Right(listOf())
+        val elements: MutableList<Either<LError, T>> = mutableListOf()
         if (parser.peek()?.type != TokenType.RParen) {
-            do (elements.add(parser.parseExpression(0)))
+            do (elements.add(parsef()))
             while (parser.match(TokenType.Comma))
         }
-        return Either.sequence(elements).map { Expr.Tuple(token, it) as Expr } assert parser.expect(TokenType.RParen)
+        return Either.sequence(elements).map { it } assert parser.expect(TokenType.RParen)
     }
 
 }
