@@ -33,6 +33,7 @@ fun generateSyntax() : LexSyntax {
         Regex("^-")      to TokenType.Minus,
 
         // Token Classes
+        Regex("^'[a-z]+")                to TokenType.Typevar,
         Regex("^[A-Z][a-zA-Z]*")         to TokenType.Typename,
         Regex("^[_a-zA-Z][a-zA-Z0-9]*")  to TokenType.Identifier,
         Regex("^0|[1-9][0-9]*\\.[0-9]+") to TokenType.Float,

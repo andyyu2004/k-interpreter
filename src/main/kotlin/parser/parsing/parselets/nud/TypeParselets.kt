@@ -10,35 +10,44 @@ object TypeParselets {
     // parses <id> : <T>
     fun parseNameTypePair(parser: Parser) : Either<LError, Pair<Token, LType?>> = parser.expect(TokenType.Identifier).bind {
         if (!parser.match(TokenType.Colon)) Right<LError, Pair<Token, LType?>>(Pair(it, null))
-        else parse(parser).map { type -> Pair<Token, LType?>(it, type) }
+        else parseType(parser).map { type -> Pair<Token, LType?>(it, type) }
     }
 
-    fun parse(parser: Parser) : Either<LError, LType> {
+    fun parseType(parser: Parser) : Either<LError, LType> {
         var type = primitive(parser)
         while (parser.match(TokenType.RArrow)) {
-            type.bind { t -> parse(parser).map { type = Right(TArrow(t, it)) }}
+            type.bind { t -> parseType(parser).map { type = Right(TArrow(t, it)) }}
         }
         return type
     }
 
     private fun primitive(parser: Parser) : Either<LError, LType> {
-        if (parser.match(TokenType.Typename)) {
-            val token = parser.lookahead(-1)!!
-            return Right(TName(token))
-        } else if (parser.match(TokenType.LParen)) {
-            println("backtrack")
-            parser.markBacktrackPoint()
-            when (val type = parse(parser)) {
-                is Right -> {
-                    return type assert parser.expect(TokenType.RParen)
-                }
-                is Left  -> {
-                    parser.backtrack()
-                    TupleParselet.parse(parser) { parse(parser) }.map { TTuple(it) }
+        when {
+            parser.match(TokenType.Typename) -> {
+                val token = parser.lookahead(-1)!!
+                return Right(TName(token))
+            }
+            parser.match(TokenType.Typevar) -> {
+                val token = parser.lookahead(-1)!!
+                return Right(TVar(token))
+            }
+            parser.match(TokenType.LParen) -> {
+                parser.markBacktrackPoint()
+                return parseType(parser).bind { type ->
+                    // If after parsing a type the next token is RParen then it was a grouping, else a Tuple
+                    when (parser.expect(TokenType.RParen)) {
+                        is Right -> Right<LError, LType>(type)
+                        is Left -> {
+                            parser.backtrack()
+                            TupleParselet.parse(parser) { parseType(parser) }.map { TTuple(it) as LType }
+                        }
+                    }
                 }
             }
+            else -> {
+                TODO()
+            }
         }
-        TODO()
     }
 
 }

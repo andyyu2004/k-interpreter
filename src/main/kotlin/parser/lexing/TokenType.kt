@@ -18,5 +18,6 @@ enum class TokenType {
     // Keywords
     Let, Var, Fn,
     // Token Classes
-    Integral, EOF, Float, String, Identifier, Typename, Unknown
+    Integral, EOF, Float, String, Identifier, Unknown,
+    Typename, Typevar
 }

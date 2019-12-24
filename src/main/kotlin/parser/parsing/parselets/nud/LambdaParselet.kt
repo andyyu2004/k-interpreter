@@ -25,7 +25,7 @@ object LambdaParselet : NullParselet {
 
         val args = Either.sequence(eargs)
         val tret =
-            if (parser.match(TokenType.RArrow)) TypeParselets.parse(parser) as Either<LError, LType?>
+            if (parser.match(TokenType.RArrow)) TypeParselets.parseType(parser) as Either<LError, LType?>
             else Right<LError, LType?>(null)
         val expect = parser.expect(TokenType.RFArrow)
         val body = parser.parseExpression(0)
