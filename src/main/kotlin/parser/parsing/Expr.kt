@@ -29,6 +29,11 @@ sealed class Expr {
     class EString(val token: Token) : Expr()
     class Tuple(val token: Token, val xs: List<Expr>): Expr()
 
+    data class Lambda(val token: Token, val args: List<Pair<Token, LType?>>, val body: Expr, val ret: LType?): Expr() {
+        override fun toString() = super.toString()
+    }
+
+
     // Try to recreate the source code format
     override fun toString() = fmt(0)
 
@@ -47,6 +52,7 @@ sealed class Expr {
         is Fn      -> TODO()
         is EString -> "\"${token.lexeme}\""
         is Tuple   -> "(${xs.joinToString(", ")})"
+        is Lambda  -> "fn (${fmtargs(args)})${fmtret(ret)} => $body"
     }.prependIndent(" ".repeat(depth))
 
     /** Fully parenthesized prefix format */
@@ -67,7 +73,20 @@ sealed class Expr {
         is Fn      -> TODO()
         is EString -> "\"${token.lexeme}\""
         is Tuple   -> "(${xs.joinToString(", ")})"
+        is Lambda  -> "(fn (${fmtargs(args)})${fmtret(ret)} ($body))"
     }.prependIndent(" ".repeat(depth))
+
+    companion object {
+        private fun fmtargs(args: List<Pair<Token, LType?>>): String =
+            args.joinToString(", ") { (token, arg) ->
+                if (arg == null) token.lexeme
+                else "${token.lexeme}: $arg"
+            }
+
+        private fun fmtret(type: LType?) =
+            if (type == null) ""
+            else " -> $type"
+    }
 
 }
 

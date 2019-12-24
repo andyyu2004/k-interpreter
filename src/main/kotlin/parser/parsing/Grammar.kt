@@ -1,6 +1,7 @@
 package parser.parsing
 
 import parser.lexing.TokenType
+import parser.parsing.parselets.nud.LambdaParselet
 import parser.parsing.parselets.nud.*
 import parser.parsing.parselets.left.*
 import java.util.*
@@ -16,17 +17,17 @@ data class Grammar(
 
 fun generateGrammar() = Grammar (
     nullParselets = EnumMap(mapOf(
-        TokenType.Identifier to NameParselet(),
-        TokenType.Float      to FloatingParselet(),
-        TokenType.Integral   to IntegralParselet(),
-        TokenType.Tilde      to PrefixOpParselet(),
-        TokenType.Plus       to PrefixOpParselet(),
-        TokenType.Minus      to PrefixOpParselet(),
-        TokenType.Bang       to PrefixOpParselet(),
+        TokenType.Identifier to NameParselet,
+        TokenType.Float      to FloatingParselet,
+        TokenType.Integral   to IntegralParselet,
+        TokenType.Tilde      to PrefixOpParselet,
+        TokenType.Plus       to PrefixOpParselet,
+        TokenType.Minus      to PrefixOpParselet,
+        TokenType.Bang       to PrefixOpParselet,
         TokenType.LParen     to GroupParselet,
-        TokenType.LBrace     to BlockParselet(),
-        TokenType.String     to StringParselet()
-
+        TokenType.LBrace     to BlockParselet,
+        TokenType.String     to StringParselet,
+        TokenType.Fn         to LambdaParselet
     )),
 
     leftParselets = EnumMap(mapOf(
@@ -35,10 +36,10 @@ fun generateGrammar() = Grammar (
         TokenType.Caret  to BinaryOpParselet(Precedence.EXPONENT, true),
         TokenType.Star   to BinaryOpParselet(Precedence.PRODUCT),
         TokenType.Slash  to BinaryOpParselet(Precedence.PRODUCT),
-        TokenType.DPlus  to PostfixOpParselet(),
-        TokenType.QMark  to TernaryParselet(),
-        TokenType.Equal  to AssignmentParselet(),
-        TokenType.LParen to ApplicationParselet()
+        TokenType.DPlus  to PostfixOpParselet,
+        TokenType.QMark  to TernaryParselet,
+        TokenType.Equal  to AssignmentParselet,
+        TokenType.LParen to ApplicationParselet
     ))
 
 )

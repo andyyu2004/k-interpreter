@@ -15,11 +15,21 @@ class Parser(private val grammar: Grammar) {
     private val precedence
         get() = grammar.leftParselets[peek()?.type]?.precedence ?: 0
 
-    fun parse(tokens: List<Token>): Either<String, Expr>{
+    // The entry point of the parser intended to be called from the repl
+    public fun parse(tokens: List<Token>): Either<List<String>, Expr>{
         this.tokens = tokens
         i = 0
+
+        // val errors = mutableListOf<String>();
+
+        // Assertation only runs lazily
         return parseExpression(0)
-                .assert({ tokens[i].type == TokenType.EOF }, Left("Did not consume all input during parsing"))
+            .assert({ tokens[i].type == TokenType.EOF }, Left("Did not consume all input during parsing"))
+            .catch(::listOf)
+    }
+
+    public fun parseProgram() {
+
     }
 
     // Don't make precedence (right binding power, rbp) default to 0 to avoid missing parameter mistakes
@@ -53,11 +63,16 @@ class Parser(private val grammar: Grammar) {
 
     fun peek() = tokens.getOrNull(i)
 
+    public fun lookahead(n: Int) : Token? {
+        return if (i + n >= tokens.count()) null
+        else tokens[i + n]
+    }
+
     /** Returns error if the current token is not the expected */
     fun expect(type: TokenType) : Either<String, Token> {
-        val next = next()!!
-        return if (next.type != type) error(next, "Expected $type found ${next.type}")
-        else Right(next)
+        val curr = peek()
+        return if (curr?.type != type) error(curr!!, "Expected $type found ${curr.type}")
+        else { i++; Right(curr) }
     }
 
     /** Return whether current token matches the parameter

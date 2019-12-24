@@ -45,13 +45,14 @@ fun interactive() {
             val line = reader.readLine("λ ")
             if (line.isBlank()) continue
             lexer.lex(line).bind {
-//                println(it)
+                // println(it)
+                // Only parse expressions in interactive mode
                 parser.parse(it)
-            }.map{
+            }.map {
                 println(it.fmtp())
                 println(it)
                 it
-            }.catch { println(Kolor.foreground(it, Color.LIGHT_RED)) }
+            }.catch { println(Kolor.foreground(it.joinToString("\n"), Color.LIGHT_RED)) }
 
 
         }

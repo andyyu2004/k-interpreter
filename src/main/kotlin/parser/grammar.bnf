@@ -1,0 +1,36 @@
+// https://doc.rust-lang.org/1.29.1/grammar.html
+
+<program> ::= <item>*
+<item>    ::= <function> | <typealias> | <struct> | '...'
+
+<function> ::= fn ID <generics>? '(' <fparams>? ')' <freturn>? <blockexpr>
+<freturn>  ::= "->" <type>
+<fparams>  ::= (<fparam> ',' )* <fparam>
+<fparam>   ::= <pattern> (':' <type>)?
+<generics> ::= '<' (<TParam> ',' )* <TParam> '>' // Disallows empty <>
+<TParam>   ::= ID
+
+<pattern>           ::= <literalpattern> | <identifierpattern> | <wildcardpattern> | <tuplepattern> | <grouppattern>
+<literalpattern>    ::= FLOAT | INTEGRAL | BOOL | STRING | CHAR
+<identifierpattern> ::= ID
+<wildcardpattern>   ::= '_'
+<tuplepattern>      ::= '(' <pattern> (',' <pattern>)+ ')'
+<grouppattern>      ::= '(' <pattern> ')'
+
+<expr>      ::= <blockexpr> | <lambda> | '...'
+<blockexpr> ::= '{' <blockbody> '}'
+<blockbody> ::= <stmt>+ <expr>?
+<lambda>    ::= 'fn' ( ID | '(' <fparams> ')' ) '=>' <expr>
+
+<stmt>      ::= <letstmt> | <exprstmt>
+<letstmt>   ::= 'let' <pattern> (':' <type>)? ('=' <expr>)? ';'
+<exprstmt>  ::= <expr> ';'
+
+<type>          ::= <primitivetype> | <functiontype> | <tupletype>
+<primitivetype> ::= 'Int' | 'Float' | 'Bool'
+<functiontype>  ::= <type> '->' <type>
+<tupletype>     ::= '()' | '(' <type> (',' <type>)* ')'
+
+
+// Notes
+(<expr> ',')* expr <=> <expr> (',' <expr>)* // Second way is probably much easier to translate in code

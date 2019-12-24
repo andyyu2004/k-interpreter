@@ -5,6 +5,7 @@ enum class TokenType {
     Plus, DPlus, TPlus, Minus, Star, Slash,
     DMinus,
     Bind,
+    Backslash,
     Bang, BangEqual,
     Tilde,
     Colon,
@@ -17,5 +18,5 @@ enum class TokenType {
     // Keywords
     Let, Var, Fn,
     // Token Classes
-    Integral, EOF, Float, String, Identifier,
+    Integral, EOF, Float, String, Identifier, Typename
 }

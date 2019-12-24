@@ -20,18 +20,17 @@ class Lexer(private val syntax: LexSyntax) {
     }
 
     // Find a better way to do string substringing, copying can't be good
-    fun lex(source: String): Either<String, List<Token>> {
+    fun lex(source: String): Either<List<String>, List<Token>> {
         reset()
         src = source + "\n"
+        val errors = mutableListOf<String>()
         while (src.isNotEmpty()) {
             if (whitespaceComments()) break
-            when (val res = match()) {
-                is Left -> return Left(res.l)
-            }
+            match().catch(errors::add)
         }
 
         tokens.add(Token("<eof>", col, line, TokenType.EOF))
-        return Right(tokens)
+        return if (errors.isEmpty()) Right(tokens) else Left(errors)
     }
 
     /** Trim whitespace and comments
@@ -68,7 +67,11 @@ class Lexer(private val syntax: LexSyntax) {
 
             return Right(Unit)
         }
-        return Left("$line:$col:Failed to lex symbol in remaining source: `${src.trimEnd()}`")
+
+        val symbol = src[0]
+        // Push it forward to prevent freeze on failure
+        src = src.substring(1)
+        return Left("$line:$col:Failed to lex symbol: `${symbol}`")
     }
 
     private fun emitToken(lexeme: String, type: TokenType) {

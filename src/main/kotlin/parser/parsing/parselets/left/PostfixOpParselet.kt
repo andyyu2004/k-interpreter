@@ -8,7 +8,7 @@ import parser.parsing.Parser
 import parser.parsing.Precedence
 import parser.parsing.parselets.left.LeftParselet
 
-class PostfixOpParselet : LeftParselet {
+object PostfixOpParselet : LeftParselet {
     override val precedence
         get() = Precedence.POSTFIX
 

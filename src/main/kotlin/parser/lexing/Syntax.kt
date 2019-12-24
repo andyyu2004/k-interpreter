@@ -8,6 +8,7 @@ fun generateSyntax() : LexSyntax {
         Regex("^\\+\\+") to TokenType.DPlus,
         Regex("^\\+")    to TokenType.Plus,
         Regex("^\\^")    to TokenType.Caret,
+        Regex("^\\\\")   to TokenType.Backslash,
         Regex("^--")     to TokenType.DMinus,
         Regex("^!=")     to TokenType.BangEqual,
         Regex("^=>")     to TokenType.RFArrow,
@@ -32,10 +33,11 @@ fun generateSyntax() : LexSyntax {
         Regex("^-")      to TokenType.Minus,
 
         // Token Classes
-        Regex("^[_a-zA-Z][a-zA-Z0-9]*") to TokenType.Identifier,
+        Regex("^[A-Z][a-zA-Z]*")         to TokenType.Typename,
+        Regex("^[_a-zA-Z][a-zA-Z0-9]*")  to TokenType.Identifier,
         Regex("^0|[1-9][0-9]*\\.[0-9]+") to TokenType.Float,
-        Regex("^0|[1-9][0-9]*") to TokenType.Integral,
-        Regex("\"([^\"]|\\.)*\"")     to TokenType.String
+        Regex("^0|[1-9][0-9]*")          to TokenType.Integral,
+        Regex("\"([^\"]|\\.)*\"")        to TokenType.String
     )
 
     val keywords = mapOf(
@@ -43,7 +45,7 @@ fun generateSyntax() : LexSyntax {
         "var"   to TokenType.Var,
         "fn"    to TokenType.Fn
     )
-    val singlelineComment = Regex("^//.*\\n")
+    val singlelineComment = Regex("^//.*(\\n|\\z)")
     val multilineComment  = Regex("^/\\*.*\\*/")
 
     return LexSyntax(symbols, keywords, singlelineComment, multilineComment)

@@ -6,6 +6,6 @@ import parser.lexing.Token
 import parser.parsing.Expr
 import parser.parsing.Parser
 
-class IntegralParselet : NullParselet {
+object IntegralParselet : NullParselet {
     override fun parse(parser: Parser, token: Token): Either<String, Expr> = Right(Expr.EInt(token))
 }

@@ -4,7 +4,7 @@ import parser.error.*
 import parser.lexing.*
 import parser.parsing.*
 
-class BlockParselet : NullParselet {
+object BlockParselet : NullParselet {
     override fun parse(parser: Parser, token: Token): Either<String, Expr> {
         if (parser.match(TokenType.RBrace)) return Right(Expr.Block(token, listOf()))
         val expressions: MutableList<Either<String, Expr>> = mutableListOf()

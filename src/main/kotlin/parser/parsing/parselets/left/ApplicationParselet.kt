@@ -4,7 +4,7 @@ import parser.error.Either
 import parser.lexing.*
 import parser.parsing.*
 
-class ApplicationParselet : LeftParselet {
+object ApplicationParselet : LeftParselet {
     override val precedence: Int
         get() = Precedence.INVOKE
 

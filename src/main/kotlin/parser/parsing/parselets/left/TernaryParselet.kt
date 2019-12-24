@@ -9,7 +9,7 @@ import parser.parsing.Parser
 import parser.parsing.Precedence
 import parser.parsing.parselets.left.LeftParselet
 
-class TernaryParselet : LeftParselet {
+object TernaryParselet : LeftParselet {
 
     override val precedence: Int
         get() = Precedence.CONDITIONAL

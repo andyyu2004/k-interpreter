@@ -7,7 +7,7 @@ import parser.parsing.Expr
 import parser.parsing.Parser
 import parser.parsing.Precedence
 
-class AssignmentParselet : LeftParselet {
+object AssignmentParselet : LeftParselet {
     override val precedence: Int
         get() = Precedence.ASSIGNMENT
 
