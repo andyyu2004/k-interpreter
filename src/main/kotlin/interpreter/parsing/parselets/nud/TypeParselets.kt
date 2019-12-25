@@ -3,14 +3,15 @@ package interpreter.parsing.parselets.nud
 import interpreter.error.*
 import interpreter.lexing.Token
 import interpreter.lexing.TokenType
+import interpreter.parsing.Binder
 import interpreter.parsing.Parser
 import interpreter.typechecking.types.*
 
 object TypeParselets {
     // parses <id> : <T>
-    fun parseNameTypePair(parser: Parser) : Either<LError, Pair<Token, LType?>> = parser.expect(TokenType.Identifier).bind {
-        if (!parser.match(TokenType.Colon)) Right<LError, Pair<Token, LType?>>(Pair(it, null))
-        else parseType(parser).map { type -> Pair<Token, LType?>(it, type) }
+    fun parseBinder(parser: Parser) : Either<LError, Binder> = parser.expect(TokenType.Identifier).bind { token ->
+        if (!parser.match(TokenType.Colon)) Right(Binder(token, null))
+        else parseType(parser).map { type -> Binder(token, type) }
     }
 
     fun parseType(parser: Parser) : Either<LError, LType> {
@@ -42,7 +43,7 @@ object TypeParselets {
                 return parseType(parser).bind { type ->
                     // If after parsing a type the next token is RParen then it was a grouping, else a Tuple
                     when (parser.expect(TokenType.RParen)) {
-                        is Right -> Right<LError, LType>(type)
+                        is Right -> Right(type)
                         is Left -> {
                             parser.backtrack()
                             TupleParselet.parse(parser) { parseType(parser) }.map { TTuple(it) as LType }

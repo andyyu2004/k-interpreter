@@ -18,6 +18,7 @@ data class Grammar(
 fun generateGrammar() = Grammar (
     nullParselets = EnumMap(mapOf(
         TokenType.Identifier to NameParselet,
+        TokenType.Let        to LetParselet,
         TokenType.Float      to FloatingParselet,
         TokenType.Integral   to IntegralParselet,
         TokenType.Tilde      to PrefixOpParselet,

@@ -54,7 +54,7 @@ fun interactive() {
                 // Parse only expressions (not programs) in interactive mode
                 parser.parse(it)
             }.map {
-//                println(it.fmtp())
+                println(it.fmtp())
                 println(it)
                 it
             }.bind { typechecker.typecheck(it) }

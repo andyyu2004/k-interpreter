@@ -13,16 +13,16 @@ enum class TokenType {
     LParen, RParen,
     Equal, DEqual, QMark,
     Dot, Comma,
-    LBrace, RBrace, DColon, SemiColon,
+    LBrace, RBrace, DColon, Semicolon,
     RFArrow, RArrow,
 
     // Keywords
-    Let, Var, Fn,
+    Let, Var, Fn, In,
     // Primitive Types
     Bool, Int, String,
 
     // Token Classes
     Integral, EOF, Float, Identifier, Unknown,
     Typename, Typevar,
-    False, True
+    False, True,
 }

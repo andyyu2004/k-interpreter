@@ -3,6 +3,7 @@ package interpreter.typechecking
 import interpreter.error.*
 import interpreter.lexing.Token
 import interpreter.lexing.toTok
+import interpreter.parsing.Binder
 import interpreter.parsing.Expr
 import interpreter.typechecking.types.*
 import interpreter.util.NameGenerator
@@ -39,7 +40,7 @@ class Typechecker {
                 expr.params = expr.params.map { (token, type) ->
                     val newtype = type ?: gen()
                     ctx[token.lexeme] = TScheme(setOf(), newtype)
-                    Pair(token, newtype)
+                    Binder(token, newtype)
                 }
                 return annotate(expr.body).map { if (expr.ret == null) expr.ret = expr.body.type }
             }

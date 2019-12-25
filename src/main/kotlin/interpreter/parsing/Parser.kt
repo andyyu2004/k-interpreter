@@ -34,7 +34,7 @@ class Parser(private val grammar: Grammar) {
 
     // Don't make precedence (right binding power, rbp) default to 0 to avoid missing parameter mistakes
     fun parseExpression(precedence: Int): Either<LError, Expr> {
-        var token = next() ?: return Left(LError(tokens[i - 1], "Ran out of tokens"))
+        var token = next() ?: return Left(LError(tokens[i - 1], "Expected an expression, but found <eof>"))
         val prefix = grammar.nullParselets[token.type]
             ?: return error(token, "Failed to parse null denotation operator $token")
 
@@ -57,7 +57,8 @@ class Parser(private val grammar: Grammar) {
     fun markBacktrackPoint() { backtrackIndex = i }
 
     private fun next() : Token? {
-        return if (i >= tokens.count()) null
+        // i + 1 to account for not eating the <eof> token
+        return if (i + 1 >= tokens.count()) null
         else tokens[i++]
     }
 
@@ -74,6 +75,12 @@ class Parser(private val grammar: Grammar) {
         return if (curr?.type != type) error(curr!!, "Expected $type found ${curr.type}")
         else { i++; Right(curr) }
     }
+
+    /** Accepts a non empty list and errors if none of the token types match */
+    fun expect(types: List<TokenType>) : Either<LError, Token> =
+        types.slice(1 until types.count()).fold(expect(types.first()), { acc, x -> acc or expect(x) })
+            .or(Left(LError(peek()!!, "Expected ${types.joinToString(" or ")} but found ${peek()?.type}")))
+
 
     /** Return whether current token matches the parameter
      * Skips the token on match otherwise remains the same */

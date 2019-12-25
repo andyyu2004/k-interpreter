@@ -7,6 +7,13 @@ import interpreter.typechecking.types.LType
  * Arithmetic Operations
  */
 
+data class Binder(val token: Token, val type: LType?) {
+    override fun toString() = when (type) {
+        null -> "$token"
+        else -> "$token: $type"
+    }
+}
+
 sealed class Expr {
     // All expressions must have type property/field and token
     abstract var type: LType?
@@ -28,9 +35,11 @@ sealed class Expr {
     class Tuple(override val token: Token, val xs: List<Expr>, override var type: LType? = null): Expr()
     class EBool(override val token: Token, val bool: Boolean, override var type: LType? = null): Expr()
 
-    data class Lambda(override val token: Token, var params: List<Pair<Token, LType?>>, val body: Expr, var ret: LType?, override var type: LType? = null): Expr() {
+    data class Lambda(override val token: Token, var params: List<Binder>, val body: Expr, var ret: LType?, override var type: LType? = null): Expr() {
         override fun toString() = super.toString()
     }
+
+    class Let(override val token: Token, val binder: Binder, val expr: Expr, val body: Expr, override var type: LType? = null): Expr()
 
     //    class Fn(override val token: Token, val params: List<String>, val body: Block, override var type: LType? = null): Expr()
 
@@ -55,10 +64,8 @@ sealed class Expr {
         is Tuple   -> "(${xs.joinToString(", ")})"
         is Lambda  -> "fn (${fmtargs(params)})${fmtret(ret)} => $body"
         is EBool   -> "$bool"
+        is Let     -> "let $binder = $expr in $body"
     }.prependIndent(" ".repeat(depth))
-
-    /** Format showing types */
-    fun fmtt() = "$this: $type"
 
     /** Fully parenthesized prefix format */
     fun fmtp() = fmtpHelper(0)
@@ -80,10 +87,11 @@ sealed class Expr {
         is Tuple   -> "(${xs.joinToString(", ")})"
         is Lambda  -> "(fn (${fmtargs(params)})${fmtret(ret)} ($body))"
         is EBool   -> "$bool"
+        is Let     -> "(let [$binder $expr] $body)"
     }.prependIndent(" ".repeat(depth))
 
     companion object {
-        private fun fmtargs(args: List<Pair<Token, LType?>>): String =
+        private fun fmtargs(args: List<Binder>): String =
             args.joinToString(", ") { (token, arg) ->
                 if (arg == null) token.lexeme
                 else "${token.lexeme}: $arg"

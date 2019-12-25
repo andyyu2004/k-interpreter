@@ -6,7 +6,9 @@ data class Token (
     val line: Int,
     val type: TokenType
 ) {
+
     override fun toString() = lexeme
+//    override fun toString() = "$lexeme $line:$col"
 
     companion object {
         fun dummy() = "<dummy>".toTok()

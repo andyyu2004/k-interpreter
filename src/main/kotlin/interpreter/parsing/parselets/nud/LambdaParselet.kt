@@ -11,17 +11,17 @@ object LambdaParselet : NullParselet {
 
     @Suppress("UNCHECKED_CAST")
     override fun parse(parser: Parser, token: Token): Either<LError, Expr> {
-        val eargs = mutableListOf<Either<LError, Pair<Token, LType?>>>()
+        val eargs = mutableListOf<Either<LError, Binder>>()
         if (parser.peek()?.type == TokenType.Identifier && parser.lookahead(1)?.type == TokenType.LParen)
             return Left(LError(token, "Lambdas can not have names like functions. Try use a let binding instead."))
 
         if (parser.match(TokenType.LParen)) {
             if (parser.peek()?.type != TokenType.RParen) {
-                do eargs.add(TypeParselets.parseNameTypePair(parser))
+                do eargs.add(TypeParselets.parseBinder(parser))
                     while (parser.match(TokenType.Comma))
             }
             when (val res = parser.expect(TokenType.RParen)) { is Left -> return Left(res.l) }
-        } else eargs.add(TypeParselets.parseNameTypePair(parser))
+        } else eargs.add(TypeParselets.parseBinder(parser))
 
         val args = Either.sequence(eargs)
         val tret =

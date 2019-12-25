@@ -28,7 +28,7 @@ fun generateSyntax() : LexSyntax {
         Regex("^,")      to TokenType.Comma,
         Regex("^\\.")    to TokenType.Dot,
         Regex("^=")      to TokenType.Equal,
-        Regex("^;")      to TokenType.SemiColon,
+        Regex("^;")      to TokenType.Semicolon,
         Regex("^!")      to TokenType.Bang,
         Regex("^-")      to TokenType.Minus,
 
@@ -43,6 +43,7 @@ fun generateSyntax() : LexSyntax {
 
     val keywords = mapOf(
         "let"   to TokenType.Let,
+        "in"    to TokenType.In,
         "var"   to TokenType.Var,
         "fn"    to TokenType.Fn,
         "false" to TokenType.False,

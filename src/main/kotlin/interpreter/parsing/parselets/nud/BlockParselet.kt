@@ -14,7 +14,7 @@ object BlockParselet : NullParselet {
                 break
             }
             expressions.add(parser.parseExpression(0))
-        } while (parser.match(TokenType.SemiColon))
+        } while (parser.match(TokenType.Semicolon))
 
         return Either.sequence(expressions)
             .assert(parser.expect(TokenType.RBrace))

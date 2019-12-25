@@ -7,10 +7,9 @@ sealed class Either<L, R> {
     abstract infix fun <T> bind(f: (R) -> Either<L, T>) : Either<L, T>
     abstract infix fun <T> bindLeft(f: (L) -> Either<T, R>) : Either<T, R>
     abstract infix fun <T> catch(f: (L) -> T) : Either<T, R>
-    // >>
-    abstract infix fun <T> and(x: Either<L, T>): Either<L, T>
-    // <*
-    abstract infix fun <T> andLeft(x: Either<L, T>): Either<L, R>
+    abstract infix fun <T> and(x: Either<L, T>): Either<L, T> // >>
+    abstract infix fun <T> andLeft(x: Either<L, T>): Either<L, R> // <*
+    abstract infix fun <T> or(x: Either<T, R>): Either<T, R>
     // Can assert an Either is Right, or assert a boolean (wrapped in thunk to only evaluate if necessary)
     abstract infix fun <T> assert(x: Either<L, T>): Either<L, R>
     abstract infix fun <T> assert(f: (R) -> Either<L, T>): Either<L, R>
@@ -79,6 +78,7 @@ class Right<L, R>(val r: R) : Either<L, R>() {
     override fun <T> assert(x: Either<L, T>): Either<L, R> = x.and(this)
     override fun assert(p: () -> Boolean, error: Either<L, R>): Either<L, R> = if (p()) Right(r) else error
     override fun <T> assert(f: (R) -> Either<L, T>): Either<L, R> = f(r).and(this)
+    override fun <T> or(x: Either<T, R>): Either<T, R> = Right(r)
 }
 
 class Left<L, R>(val l: L) : Either<L, R>() {
@@ -94,6 +94,7 @@ class Left<L, R>(val l: L) : Either<L, R>() {
     override fun unwrap(): R = error("Unwrapped a left")
     override fun toString() = "Left {${l}}"
     override fun <T> assert(f: (R) -> Either<L, T>): Either<L, R> = Left(l)
+    override fun <T> or(x: Either<T, R>): Either<T, R> = x
 }
 
 
