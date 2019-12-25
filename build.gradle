@@ -35,15 +35,19 @@ dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
 }
 
+test {
+    testLogging.showStandardStreams(true)
+}
+
 application {
     // Define the main class for the application.
-    mainClassName = 'parser.AppKt'
+    mainClassName = 'interpreter.AppKt'
 }
 
 jar {
     manifest {
         attributes(
-            'Main-Class': 'parser.AppKt'
+            'Main-Class': 'interpreter.AppKt'
         )
     }
 

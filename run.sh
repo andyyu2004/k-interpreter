@@ -1,1 +1,1 @@
-gradle build && kotlin build/libs/parser.jar
+gradle build && kotlin build/libs/interpreter.jar
