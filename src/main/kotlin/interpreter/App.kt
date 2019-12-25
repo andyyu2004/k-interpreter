@@ -2,6 +2,7 @@ package interpreter
 
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
+import interpreter.error.ErrorFormatter
 import org.jline.reader.LineReader
 import org.jline.reader.UserInterruptException
 import org.jline.reader.impl.LineReaderImpl
@@ -27,12 +28,11 @@ fun main() {
     interactive()
 }
 
-
-
 fun interactive() {
     val lexer = Lexer(generateSyntax())
     val parser = Parser(generateGrammar())
     val typechecker = Typechecker()
+    val formatter = ErrorFormatter()
 
     val terminal = TerminalBuilder.builder()
         .system(true)
@@ -47,6 +47,8 @@ fun interactive() {
     try {
         while (true) {
             val line = reader.readLine("λ ")
+            formatter.src = line.split("\n")
+
             if (line.isBlank()) continue
             lexer.lex(line).bind {
                 // println(it)
@@ -58,7 +60,7 @@ fun interactive() {
                 it
             }.bind {
                 typechecker.typecheck(it)
-            }.catch { println(Kolor.foreground(it.joinToString("\n"), Color.LIGHT_RED)) }
+            }.catch(formatter::print)
 
 
         }

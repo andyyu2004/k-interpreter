@@ -17,7 +17,7 @@ class Typechecker {
         when (val res = annotate(expr)) { is Left -> return Left(listOf(res.l)) }
         return constrain(expr)
             .assert {
-                println(it)
+//                println(it)
                 it.checkConsistency()
             }
             .bind(::unifyConstraint)
