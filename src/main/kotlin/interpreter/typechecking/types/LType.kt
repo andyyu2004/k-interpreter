@@ -3,21 +3,30 @@ package interpreter.typechecking.types
 import interpreter.error.*
 import interpreter.lexing.Token
 import interpreter.typechecking.*
+import interpreter.util.NameGenerator
 
 sealed class LType: Substitutable<LType> {
     infix fun arrow(other: LType) = TArrow(this, other)
     infix fun eq(other: LType): Constraint = CEq(this, other)
 
-    infix fun unify(t: LType): Either<LError, Substitution> = when {
-        this == t                     -> Right(Substitution.empty())
-        this is TVar                  -> this bind t
-        t is TVar                     -> t bind this
-        // Unify respective components and compose the substitutions
-        this is TArrow && t is TArrow -> Either.sequence2(Pair(
-            l unify t.l,
-            r unify t.r
-        )).map { (s0, s1) -> s0 compose s1 }
-        else -> Left(LError(Token.dummy(), "Failed to unify type $this with $t"))
+    fun normalizeTypeVariables(): LType {
+        val g = NameGenerator()
+        val map = mutableMapOf<String, String>()
+        fun norm(type: LType) : LType = when (type) {
+            is TArrow -> TArrow(norm(type.l), norm(type.r))
+            is TVar   -> {
+                val (name, col, line, tokentype) = type.token
+                if (map.containsKey(name)) TVar(Token(map[name]!!, col, line, tokentype))
+                else {
+                    val newname = g.gen()
+                    map[name] = newname
+                    TVar(Token(newname, col, line, tokentype))
+                }
+            }
+            is TTuple -> TTuple(type.types.map(::norm))
+            else -> type
+        }
+        return norm(this)
     }
 }
 

@@ -6,7 +6,7 @@
 <function> ::= fn ID <generics>? '(' <fparams>? ')' <freturn>? <blockexpr>
 <freturn>  ::= "->" <type>
 <fparams>  ::= (<fparam> ',' )* <fparam>
-<fparam>   ::= <pattern> (':' <type>)?
+<fparam>   ::= <pattern> <typeannotation>?
 <generics> ::= '<' (<TParam> ',' )* <TParam> '>' // Disallows empty <>
 <TParam>   ::= ID
 
@@ -17,13 +17,16 @@
 <tuplepattern>      ::= '(' <pattern> (',' <pattern>)+ ')'
 <grouppattern>      ::= '(' <pattern> ')'
 
-<expr>      ::= <blockexpr> | <lambda> | '...'
+<typeannotation> ::= ':' <type>
+
+<expr>      ::= <blockexpr> | <lambda> | <letexpr> | '...'
 <blockexpr> ::= '{' <blockbody> '}'
 <blockbody> ::= <stmt>+ <expr>?
+<letexpr>   ::= 'let' ID <typeannotation>? '=' <expr> ('in' | ';') <expr>
 <lambda>    ::= 'fn' ( ID | '(' <fparams> ')' ) '=>' <expr>
 
 <stmt>      ::= <letstmt> | <exprstmt>
-<letstmt>   ::= 'let' <pattern> (':' <type>)? ('=' <expr>)? ';'
+// <letstmt>   ::= 'let' <pattern> (':' <type>)? ('=' <expr>)? ';'
 <exprstmt>  ::= <expr> ';'
 
 <type>          ::= <primitivetype> | <functiontype> | <tupletype>

@@ -64,6 +64,21 @@ class SubstitutionTest {
                 "c" to TVar("z".toTok())
         )), s0 compose s1 compose s2)
     }
+
+    @Test fun emptyComposition() {
+        val s0 = Substitution(mapOf(
+                "a" to TInt,
+                "b" to TVar("t".toTok()),
+                "c" to TVar("x".toTok()),
+                "a" to TBool,
+                "t" to TInt,
+                "x" to TVar("z".toTok()),
+                "t" to TBool
+        ))
+
+        assertEquals(s0, s0 compose Substitution.empty())
+        assertEquals(s0, Substitution.empty() compose s0)
+    }
 }
 
 

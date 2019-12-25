@@ -51,16 +51,15 @@ fun interactive() {
 
             if (line.isBlank()) continue
             lexer.lex(line).bind {
-                // println(it)
-                // Only parse expressions in interactive mode
+                // Parse only expressions (not programs) in interactive mode
                 parser.parse(it)
             }.map {
-                println(it.fmtp())
+//                println(it.fmtp())
                 println(it)
                 it
-            }.bind {
-                typechecker.typecheck(it)
-            }.catch(formatter::print)
+            }.bind { typechecker.typecheck(it) }
+            .map(::println)
+            .catch(formatter::print)
 
 
         }

@@ -73,8 +73,9 @@ class Right<L, R>(val r: R) : Either<L, R>() {
     override fun isLeft() = false
     override fun unwrap(): R = r
     override fun toString() = "Right {${r}}"
-    override fun <T> andLeft(x: Either<L, T>): Either<L, R> = this
+    override fun <T> andLeft(x: Either<L, T>): Either<L, R> = x.and(this)
     // Expect fails if the parameter is left, but unlike and keeps the old value
+    // Synonym for andLeft
     override fun <T> assert(x: Either<L, T>): Either<L, R> = x.and(this)
     override fun assert(p: () -> Boolean, error: Either<L, R>): Either<L, R> = if (p()) Right(r) else error
     override fun <T> assert(f: (R) -> Either<L, T>): Either<L, R> = f(r).and(this)
